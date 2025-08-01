@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smartphone Purchase Predictor</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+    <div id="loading-overlay">
+        <div class="loader"></div>
+        <p>Loading dashboard data...</p>
+    </div>
+    
+    <div class="app-container">
+        <header>
+            <h1>Smartphone Purchase Predictor</h1>
+            <p class="tagline">AI-powered insights for smartphone purchase behavior</p>
+        </header>
+
+        <nav class="main-nav">
+            <ul>
+                <li class="active"><a href="#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="#predictions"><i class="fas fa-magic"></i> Predict</a></li>
+                <li><a href="#insights"><i class="fas fa-lightbulb"></i> Insights</a></li>
+                <li><a href="#data"><i class="fas fa-database"></i> Data</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="active-section">
+                <div class="dashboard-grid">
+                    <div class="card summary-card">
+                        <h2>Purchase Behavior Summary</h2>
+                        <div class="summary-stats-container">
+                            <div class="stat-box">
+                                <div class="stat-label-dot">Purchase Rate:</div>
+                                <div class="stat-value" id="purchase-rate">
+                                    <span class="stat-value-number">0</span>
+                                    <span class="stat-value-unit">%</span>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label-dot">Average Age:</div>
+                                <div class="stat-value" id="avg-age">
+                                    <span class="stat-value-number">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-label-dot">Average Salary:</div>
+                                <div class="stat-value" id="avg-salary">
+                                    <span class="salary-value">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card chart-card">
+                        <h2>Purchase by Age Group</h2>
+                        <div class="chart-container" id="age-chart-container">
+                            <canvas id="age-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card chart-card">
+                        <h2>Brand Preference Distribution</h2>
+                        <div class="chart-container" id="brand-chart-container">
+                            <canvas id="brand-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card chart-card">
+                        <h2>Key Purchase Factors</h2>
+                        <div class="chart-container" id="factors-chart-container">
+                            <canvas id="factors-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card feature-importance-card">
+                        <h2>Feature Importance</h2>
+                        <div class="feature-importance-container">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card customer-segments-card">
+                        <h2>Customer Segments</h2>
+                        <div id="personas" class="segments-container">
+                            <!-- Will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prediction Section -->
+            <section id="predictions-section" class="hidden-section">
+                <div class="prediction-container">
+                    <h2>Predict Purchase Likelihood</h2>
+                    <div class="prediction-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <input type="number" id="age" min="18" max="80" value="28">
+                            </div>
+                            <div class="form-group">
+                                <label for="salary">Annual Salary ($)</label>
+                                <input type="number" id="salary" min="20000" max="200000" value="50000">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="brand-preference">Brand Preference</label>
+                                <select id="brand-preference">
+                                    <!-- Will be populated by JS -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="os-preference">Preferred OS</label>
+                                <select id="os-preference">
+                                    <!-- Will be populated by JS -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="online-activity">Online Activity Score (0-100)</label>
+                                <input type="range" id="online-activity" min="0" max="100" value="70">
+                                <span id="online-activity-value">70</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="tech-savvy">
+                                <label for="tech-savvy">Tech Savvy</label>
+                            </div>
+                            <div class="form-group">
+                                <label for="previous-purchases">Previous Smartphone Purchases</label>
+                                <input type="number" id="previous-purchases" min="0" max="10" value="2">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="loyalty-score">Brand Loyalty Score (0-10)</label>
+                                <input type="range" id="loyalty-score" min="0" max="10" value="5">
+                                <span id="loyalty-score-value">5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="session-time">Avg. Online Session Time (hours)</label>
+                                <input type="number" id="session-time" min="0" max="10" step="0.1" value="2.0">
+                            </div>
+                            <div class="form-group">
+                                <label for="social-influence">Social Media Influence (0-100)</label>
+                                <input type="range" id="social-influence" min="0" max="100" value="60">
+                                <span id="social-influence-value">60</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="warranty-interest">
+                                <label for="warranty-interest">Warranty Interest</label>
+                            </div>
+                        </div>
+                        
+                        <button id="predict-btn" class="primary-btn">Predict Purchase Likelihood</button>
+                    </div>
+                    
+                    <div class="prediction-result hidden">
+                        <h3>Prediction Result</h3>
+                        <div class="result-container">
+                            <div class="probability-meter">
+                                <div class="meter-label">Purchase Likelihood</div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill"></div>
+                                </div>
+                                <div class="meter-value">0%</div>
+                            </div>
+                            
+                            <div class="result-explanation">
+                                <h4>Key Factors</h4>
+                                <ul id="key-factors-list">
+                                    <!-- Will be populated by JS -->
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="similar-customers">
+                            <h4>Similar Customer Profiles</h4>
+                            <div class="similar-customers-list">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Insights Section -->
+            <section id="insights-section" class="hidden-section">
+                <div class="insights-container">
+                    <h2>Purchase Behavior Insights</h2>
+                    
+                    <div class="insight-cards">
+                        <div class="insight-card">
+                            <div class="insight-icon"><i class="fas fa-users"></i></div>
+                            <h3>Customer Segments</h3>
+                            <p>Discover distinct customer segments and their purchase behaviors</p>
+                            <div id="autoprofile" class="autoprofile-section"></div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon"><i class="fas fa-route"></i></div>
+                            <h3>Purchase Journey</h3>
+                            <p>Explore the customer journey from consideration to purchase</p>
+                            <div class="journey-visualization">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon"><i class="fas fa-network-wired"></i></div>
+                            <h3>Feature Relationships</h3>
+                            <p>Interactive network of relationships between customer attributes</p>
+                            <div class="feature-network">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="insight-card">
+                            <div class="insight-icon"><i class="fas fa-sliders-h"></i></div>
+                            <h3>What-If Analysis</h3>
+                            <p>See how changing factors affects purchase likelihood</p>
+                            <div id="what-if" class="what-if-tool">
+                                <!-- Will be populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Section -->
+            <section id="data-section" class="hidden-section">
+                <div class="data-container">
+                    <h2>Dataset Explorer</h2>
+                    
+                    <div class="data-filters">
+                        <div class="filter-group">
+                            <label for="data-filter">Quick Filter:</label>
+                            <select id="data-filter">
+                                <option value="all">All Data</option>
+                                <option value="purchased">Purchased Only</option>
+                                <option value="not-purchased">Not Purchased Only</option>
+                            </select>
+                        </div>
+                        
+                        <div class="search-group">
+                            <input type="text" id="data-search" placeholder="Search data...">
+                        </div>
+                    </div>
+                    
+                    <div class="data-table-container">
+                        <table id="data-table" class="data-table">
+                            <thead>
+                                <!-- Will be populated by JS -->
+                            </thead>
+                            <tbody>
+                                <!-- Will be populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="data-pagination">
+                        <button id="prev-page" class="pagination-btn" disabled><i class="fas fa-chevron-left"></i> Previous</button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button id="next-page" class="pagination-btn" disabled>Next <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
